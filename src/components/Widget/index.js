@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
 const Widget = styled.div`
   margin-top: 24px;
@@ -19,7 +19,7 @@ const Widget = styled.div`
     font-weight: 400;
     line-height: 1;
   }
-`
+`;
 
 Widget.Content = styled.div`
   padding: 24px 32px 32px 32px;
@@ -32,8 +32,21 @@ Widget.Content = styled.div`
   ul {
     list-style: none;
     padding: 0;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around
   }
-`
+  ul li{
+    font-size: 14px;
+    line-height: 17px;
+    margin-top: 5px;
+    padding: 5px;
+    
+    background-color: ${({ theme }) => theme.colors.containerbg};
+    border-radius: 4px;
+  }
+`;
 Widget.Header = styled.header`
   display: flex;
   justify-content: flex-start;
@@ -44,6 +57,6 @@ Widget.Header = styled.header`
   * {
     margin: 0;
   }
-`
+`;
 
-export default Widget
+export default Widget;
