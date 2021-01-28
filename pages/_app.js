@@ -26,9 +26,6 @@ const GlobalStyle = createGlobalStyle`
     display: flex;
     flex-direction: column;
   }
-  button:disabled{
-    background-color: #979797;
-  }
 `;
 
 const { theme } = db;

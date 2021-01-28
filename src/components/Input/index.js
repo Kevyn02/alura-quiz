@@ -1,16 +1,15 @@
 import styled from 'styled-components';
 
 const Input = styled.input`
+  width: 100%;
+  padding: 15px;
   font-size: 14px;
-  line-height: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 4px;
-
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.contrastText};
   background-color: ${({ theme }) => theme.colors.mainbg};
-  color: #F9F9FF;
-
-  height: 40px;
-  width: 283px;
+  border-radius: ${({ theme }) => theme.borderRadius};
+  outline: 0;
+  margin-bottom: 25px;
 `;
 
 export default Input;

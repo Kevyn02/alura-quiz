@@ -40,7 +40,7 @@ export default function Home() {
               <legend>{db.description}</legend>
               <Input type="text" placeholder="Digite seu nome" onChange={(e) => setName(e.target.value)} value={name} />
               {/* eslint-disable-next-line react/jsx-one-expression-per-line */}
-              <Button type="submit" disabled={name.length === 0}>Jogar {name}</Button>
+              <Button type="submit" disabled={name.length === 0}>{`Jogar ${name}`}</Button>
             </Form>
           </Widget.Content>
         </Widget>
