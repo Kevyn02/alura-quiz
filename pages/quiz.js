@@ -6,6 +6,7 @@ import db from '../db.json';
 import QuizBackground from '../src/components/QuizBackground';
 import QuizContainer from '../src/components/QuizContainer';
 import QuizLogo from '../src/components/QuizLogo';
+import AlternativeForm from '../src/components/AlternativeForm';
 import Widget from '../src/components/Widget';
 import Button from '../src/components/Button';
 
@@ -22,7 +23,7 @@ function LoadingWidget() {
   );
 }
 
-function QuizComplete({ acertos, totalQuestions }) {
+function ResultWidget({ results }) {
   return (
     <Widget>
       <Widget.Header>
@@ -31,12 +32,20 @@ function QuizComplete({ acertos, totalQuestions }) {
         </h3>
       </Widget.Header>
       <Widget.Content>
-        <h2>
-          Parabéns Por Finalizar
-        </h2>
         <p>
-          Você Acertou {acertos} de {totalQuestions} perguntas
+          Você Acertou {
+            results.filter((result) => result).length
+          } de {results.length} perguntas
         </p>
+        <ul>
+          {/* eslint-disable-next-line array-callback-return */}
+          {results.map((result, index) => {
+            // eslint-disable-next-line react/no-array-index-key
+            <li key={index}>
+              ´#${index + 1} Resultado: ${result ? 'Acertou' : 'Errou'}`
+            </li>;
+          })}
+        </ul>
         <Button type="button">
           Confirmar
         </Button>
@@ -46,8 +55,15 @@ function QuizComplete({ acertos, totalQuestions }) {
 }
 
 function QuestionWidget({
-  question, totalQuestions, questionIndex, handleSubmit, handleAnswer,
+  question, totalQuestions, questionIndex, handleSubmit,
 }) {
+  const [selectedAlternative, setSelectedAlternative] = useState(undefined);
+  const questionID = `question__${questionIndex}`;
+  const [isQuestionSubmited, setIsQuestionSubmited] = useState(false);
+  // eslint-disable-next-line radix
+  const isCorrect = Number.parseInt(selectedAlternative) === question.answer;
+  const hasAlternativeSelected = selectedAlternative !== undefined;
+
   return (
     <Widget>
       <Widget.Header>
@@ -71,43 +87,59 @@ function QuestionWidget({
         <p>
           {question.description}
         </p>
+        <AlternativeForm onSubmit={(e) => {
+          e.preventDefault();
+          setIsQuestionSubmited(true);
+          setTimeout(() => {
+            setIsQuestionSubmited(false);
+            setSelectedAlternative(undefined);
+            handleSubmit(isCorrect);
+          }, 3000);
+        }}
+        >
+          {question.alternatives.map((alternative, alternativeIndex) => {
+            const alternativeId = `alternative__${alternativeIndex}`;
+            const alternativeStatus = isCorrect ? 'SUCCESS' : 'ERROR';
+            // eslint-disable-next-line radix
+            const isSelected = Number.parseInt(selectedAlternative) === alternativeIndex;
 
-        <form onSubmit={handleSubmit}>
-          {question.alternatives.map((alternative, index) => {
-            const alternativeId = `alternative__${index}`;
             return (
               <Widget.Topic
                 as="label"
                 htmlFor={alternativeId}
                 key={alternativeId}
+                data-selected={isSelected}
+                data-status={isQuestionSubmited && alternativeStatus}
               >
                 <input
                   id={alternativeId}
-                  name={questionIndex}
+                  name={questionID}
                   type="radio"
-                  value={index}
-                  onChange={(e) => handleAnswer(e.target.value)}
+                  value={alternativeIndex}
+                  disabled={isQuestionSubmited}
+                  onChange={(e) => setSelectedAlternative(e.target.value)}
                 />
                 {alternative}
               </Widget.Topic>
             );
           })}
-          <Button type="submit">
+          <Button type="submit" disabled={!hasAlternativeSelected}>
             Confirmar
           </Button>
-        </form>
+          {isQuestionSubmited && isCorrect && <p>Você acertou!</p>}
+          {isQuestionSubmited && !isCorrect && <p>Você errou!</p>}
+        </AlternativeForm>
 
       </Widget.Content>
     </Widget>
   );
 }
 
-export default function Quiz() {
+export default function QuizPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [conclusion, setConclusion] = useState(false);
-  const [acertos, setAcertos] = useState(0);
-  const [userAnswer, setUserAnswer] = useState(0);
+  const [quizFinished, setQuizFinished] = useState(false);
+  const [results, setResults] = useState([]);
   const questionIndex = currentQuestion;
   const question = db.questions[questionIndex];
   const totalQuestions = db.questions.length;
@@ -116,25 +148,16 @@ export default function Quiz() {
     setTimeout(() => {
       setLoading(false);
     }, 1000);
-  }, [currentQuestion, conclusion]);
+  }, [currentQuestion, quizFinished]);
 
-  function handleAnswer(anwser) {
-    // eslint-disable-next-line radix
-    setUserAnswer(Number.parseInt(anwser));
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    //
-    if (userAnswer === question.answer) {
-      setAcertos(acertos + 1);
-    }
+  function handleSubmit(isCorrect) {
     const nextQuestion = questionIndex + 1;
     if (nextQuestion < totalQuestions) {
       setCurrentQuestion(nextQuestion);
     } else {
-      setConclusion(true);
+      setQuizFinished(true);
     }
+    setResults([...results, isCorrect]);
     setLoading(true);
   }
 
@@ -145,20 +168,18 @@ export default function Quiz() {
         {/* eslint-disable-next-line no-mixed-operators */}
         {loading && <LoadingWidget />}
         {/* eslint-disable-next-line no-mixed-operators */}
-        {!loading && !conclusion && (
+        {!loading && !quizFinished && (
           <QuestionWidget
             question={question}
             totalQuestions={totalQuestions}
             questionIndex={questionIndex}
             handleSubmit={handleSubmit}
-            handleAnswer={handleAnswer}
           />
         )}
         {/* eslint-disable-next-line no-mixed-operators */}
-        {!loading && conclusion && (
-          <QuizComplete
-            acertos={acertos}
-            totalQuestions={totalQuestions}
+        {!loading && quizFinished && (
+          <ResultWidget
+            results={results}
           />
         )}
       </QuizContainer>
