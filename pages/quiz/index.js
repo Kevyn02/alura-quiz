@@ -1,18 +1,29 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
-import db from '../db.json';
+import { motion } from 'framer-motion';
+import db from '../../db.json';
 
-import QuizBackground from '../src/components/QuizBackground';
-import QuizContainer from '../src/components/QuizContainer';
-import QuizLogo from '../src/components/QuizLogo';
-import AlternativeForm from '../src/components/AlternativeForm';
-import Widget from '../src/components/Widget';
-import Button from '../src/components/Button';
+import QuizBackground from '../../src/components/QuizBackground';
+import QuizContainer from '../../src/components/QuizContainer';
+import QuizLogo from '../../src/components/QuizLogo';
+import AlternativeForm from '../../src/components/AlternativeForm';
+import Widget from '../../src/components/Widget';
+import Button from '../../src/components/Button';
+import BackLinkArrow from '../../src/components/BackLinkArrow';
 
 function LoadingWidget() {
   return (
-    <Widget>
+    <Widget
+      as={motion.section}
+      transition={{ delay: 0, duration: 0.5 }}
+      variants={{
+        show: { opacity: 1, y: '0' },
+        hidden: { opacity: 0, y: '100%' },
+      }}
+      initial="hidden"
+      animate="show"
+    >
       <Widget.Header>
         Carregando...
       </Widget.Header>
@@ -25,7 +36,16 @@ function LoadingWidget() {
 
 function ResultWidget({ results }) {
   return (
-    <Widget>
+    <Widget
+      as={motion.section}
+      transition={{ delay: 0.5, duration: 0.5 }}
+      variants={{
+        show: { opacity: 1, y: '0' },
+        hidden: { opacity: 0, y: '100%' },
+      }}
+      initial="hidden"
+      animate="show"
+    >
       <Widget.Header>
         <h3>
           Quiz Completo!!!
@@ -39,12 +59,12 @@ function ResultWidget({ results }) {
         </p>
         <ul>
           {/* eslint-disable-next-line array-callback-return */}
-          {results.map((result, index) => {
+          {results.map((result, index) => (
             // eslint-disable-next-line react/no-array-index-key
             <li key={index}>
-              ´#${index + 1} Resultado: ${result ? 'Acertou' : 'Errou'}`
-            </li>;
-          })}
+              #{index + 1} Resultado: {result ? 'Acertou' : 'Errou'}
+            </li>
+          ))}
         </ul>
         <Button type="button">
           Confirmar
@@ -65,8 +85,18 @@ function QuestionWidget({
   const hasAlternativeSelected = selectedAlternative !== undefined;
 
   return (
-    <Widget>
+    <Widget
+      as={motion.section}
+      transition={{ delay: 0.5, duration: 0.5 }}
+      variants={{
+        show: { opacity: 1, y: '0' },
+        hidden: { opacity: 0, y: '100%' },
+      }}
+      initial="hidden"
+      animate="show"
+    >
       <Widget.Header>
+        <BackLinkArrow href="/" />
         <h3>
           Pergunta {questionIndex + 1} de {totalQuestions}
         </h3>
@@ -115,9 +145,9 @@ function QuestionWidget({
                   id={alternativeId}
                   name={questionID}
                   type="radio"
-                  value={alternativeIndex}
+                  style={{ display: 'none' }}
                   disabled={isQuestionSubmited}
-                  onChange={(e) => setSelectedAlternative(e.target.value)}
+                  onChange={() => setSelectedAlternative(alternativeIndex)}
                 />
                 {alternative}
               </Widget.Topic>
@@ -135,14 +165,25 @@ function QuestionWidget({
   );
 }
 
-export default function QuizPage() {
+export default function QuizPage({ dbExterno }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [loading, setLoading] = useState(true);
   const [quizFinished, setQuizFinished] = useState(false);
   const [results, setResults] = useState([]);
   const questionIndex = currentQuestion;
-  const question = db.questions[questionIndex];
-  const totalQuestions = db.questions.length;
+
+  let question;
+  let totalQuestions;
+  let backgroundImage;
+  if (dbExterno) {
+    question = dbExterno.questions[questionIndex];
+    totalQuestions = dbExterno.questions.length;
+    backgroundImage = dbExterno.bg;
+  } else {
+    question = db.questions[questionIndex];
+    totalQuestions = db.questions.length;
+    backgroundImage = db.bg;
+  }
 
   useEffect(() => {
     setTimeout(() => {
@@ -162,7 +203,7 @@ export default function QuizPage() {
   }
 
   return (
-    <QuizBackground backgroundImage={db.bg}>
+    <QuizBackground backgroundImage={backgroundImage}>
       <QuizContainer>
         <QuizLogo />
         {/* eslint-disable-next-line no-mixed-operators */}

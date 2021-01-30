@@ -4,20 +4,31 @@ const Widget = styled.div`
   margin-top: 24px;
   margin-bottom: 24px;
   border: 1px solid ${({ theme }) => theme.colors.primary};
-  background-color: ${({ theme }) => theme.colors.mainbg};
-  border-radius: ${({ theme }) => theme.borderRadius};
+  background-color: ${({ theme }) => theme.colors.mainBg};
+  border-radius: 4px;
   overflow: hidden;
-
-  h1, h2, h3{
+  h1, h2, h3 {
     font-size: 16px;
     font-weight: 700;
     line-height: 1;
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
-  p{
+  p {
     font-size: 14px;
     font-weight: 400;
     line-height: 1;
+  }
+`;
+
+Widget.Header = styled.header`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 18px 32px;
+  background-color: ${({ theme }) => theme.colors.primary};
+  
+  * {
+    margin: 0;
   }
 `;
 
@@ -32,36 +43,10 @@ Widget.Content = styled.div`
   ul {
     list-style: none;
     padding: 0;
-    
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around
-  }
-  ul li{
-    font-size: 14px;
-    line-height: 17px;
-    margin-top: 5px;
-    padding: 5px;
-    
-    background-color: ${({ theme }) => theme.colors.containerbg};
-    border-radius: 4px;
   }
 `;
-Widget.Header = styled.header`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 18px 32px;
-  background-color: ${({ theme }) => theme.colors.primary};
 
-  * {
-    margin: 0;
-  }
-`;
 Widget.Topic = styled.a`
-  /* width: 100%;
-  border: none; */
-
   outline: 0;
   text-decoration: none;
   color: ${({ theme }) => theme.colors.contrastText};
@@ -76,6 +61,10 @@ Widget.Topic = styled.a`
   &:hover,
   &:focus {
     opacity: .5;
+  }
+  &[data-disabled="true"]{
+    background-color: #979797;
+    cursor: not-allowed;
   }
 `;
 
